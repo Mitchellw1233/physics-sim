@@ -1,6 +1,9 @@
-from typing import Type
+from typing import Type, TypeVar
 
 from v1.engine.context.context import Context
+
+
+CType = TypeVar('CType', bound=Context)
 
 
 class ContextContainer:
@@ -8,12 +11,10 @@ class ContextContainer:
 
     container: dict[str, Context] = {}
 
-    def get(self, ctype: Type[Context]) -> Context:
+    def get(self, ctype: Type[CType]) -> CType:
         return self.container[str(ctype)]
 
     def add(self, c: Context):
-        print(self.container)
-        print(str(type(c)) in self.container)
         if str(type(c)) in self.container:
             raise KeyError(f'Context "{type(c)}" already exists')
 

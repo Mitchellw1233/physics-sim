@@ -44,6 +44,7 @@ class Simulation:
 
     # Other
     context_container: ContextContainer
+    loop_counter = 0
 
     def __init__(self, renderer: Renderer, listeners: list[Type[Listener]], contexts: list[Context]):
         self.renderer = renderer
@@ -55,20 +56,14 @@ class Simulation:
             self.context_container.add(c)
 
         # Setup listeners
-        self.listeners[0] = PhysicsListener(self.context_container)
         for i in range(len(listeners)):
             self.listeners[i] = listeners[i](self.context_container)
 
+        # Append PhysicsListener last, to ensure all listener actions are translated into physics
+        self.listeners[len(self.listeners)] = PhysicsListener(self.context_container)
+
     def setup(self):
-        # Setup environment: categorize physical components and assign right listeners to components
-        for cid in self.env:
-            if isinstance(self.env[cid], PhysicalComponent):
-                self.physical_components.append(cid)
-
-            for lid in self.listeners:
-                if self.listeners[lid].should_listen(self.env[cid]):
-                    self.components_meta[cid]['listeners'].append(lid)
-
+        # Most is moved to add_component
         self.renderer.setup(self.env)
 
     def start(self):
@@ -77,10 +72,17 @@ class Simulation:
             for lid in self.components_meta[cid]['listeners']:
                 self.listeners[lid].start(self.env[cid])
 
+        self.renderer.render_frame(self.env)
+        self.renderer.next_frame()
+
+        # thread = threading.Thread(target=target)
+        # thread.start()
         while self.run is True:
+            self.loop_counter += 1
             self.loop()
 
     def loop(self):
+        print(f'loop count: {self.loop_counter}')
         # TODO: does order matter?
         # Execute single loop per listener
         for lid in self.listeners:
@@ -94,9 +96,12 @@ class Simulation:
         # Render/visualize next frame
         self.renderer.render_frame(self.env)
         self.renderer.next_frame()
+        if self.renderer.frame_limit == self.loop_counter:
+            self.stop()
 
     def stop(self):
         self.run = False
+        self.renderer.save()
 
     def add_component(self, c: Component):
         c.id = list(self.env)[-1] + 1 if len(self.env) > 0 else 0

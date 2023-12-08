@@ -24,6 +24,10 @@ class Renderer:
         pass
 
     @abstractmethod
+    def save(self, name: str = 'out'):
+        pass
+
+    @abstractmethod
     def add_component(self, c: Component):
         pass
 

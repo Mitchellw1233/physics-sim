@@ -1,4 +1,4 @@
-from math import atan2, asin, pi
+from math import atan2, asin, pi, cos, sin
 
 from v1.engine.util.angle3d import Angle3D
 from v1.engine.util.vector3d import Vector3D
@@ -22,4 +22,20 @@ class Quaternion:
             atan2(2 * (self.w * self.x + self.y * self.z), 1 - 2 * (self.x ** 2 + self.y ** 2)),
             asin(2 * (self.w * self.y - self.z * self.x)),
             atan2(2 * (self.w * self.z + self.x * self.y), 1 - 2 * (self.y ** 2 + self.z ** 2))
+        )
+
+    @staticmethod
+    def from_euler_angles(euler: Angle3D):
+        cx = cos(euler.x / 2)
+        sx = sin(euler.x / 2)
+        cy = cos(euler.y / 2)
+        sy = sin(euler.y / 2)
+        cz = cos(euler.z / 2)
+        sz = sin(euler.z / 2)
+
+        return Quaternion(
+            cx * cy * cz - sx * sy * sz,
+            sx * cy * cz + cx * sy * sz,
+            cx * sy * cz - sx * cy * sz,
+            cx * sy * cz + sx * sy * cz,
         )

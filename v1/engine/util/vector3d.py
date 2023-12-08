@@ -60,6 +60,12 @@ class Vector3D:
             return Vector3D(self.x ** other.x, self.y ** other.y, self.z ** other.z)
         raise ArithmeticError()
 
+    def __pos__(self):
+        return Vector3D(+self.x, +self.y, +self.z)
+
+    def __neg__(self):
+        return Vector3D(-self.x, -self.y, -self.z)
+
     def __radd__(self, other):
         return self.__add__(other)
 
@@ -101,3 +107,31 @@ class Vector3D:
 
     def __ipow__(self, other):
         return self.__pow__(other)
+
+    @staticmethod
+    def zero():
+        return Vector3D(0, 0, 0)
+
+    @staticmethod
+    def right():
+        return Vector3D(1, 0, 0)
+
+    @staticmethod
+    def left():
+        return Vector3D(-1, 0, 0)
+
+    @staticmethod
+    def forward():
+        return Vector3D(0, 1, 0)
+
+    @staticmethod
+    def backwards():
+        return Vector3D(0, -1, 0)
+
+    @staticmethod
+    def up():
+        return Vector3D(0, 0, 1)
+
+    @staticmethod
+    def down():
+        return Vector3D(0, 0, -1)

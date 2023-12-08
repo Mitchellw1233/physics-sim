@@ -1,10 +1,13 @@
 import bpy
 
+from root import base_dir
 from v1.engine.component.component import Component
 from v1.rendering.renderer import Renderer
 
 
 class BlenderRenderer(Renderer):
+    frame: int = 0
+
     def setup(self, frame: dict[int, Component]):
         self._clear_scene()
 
@@ -14,10 +17,12 @@ class BlenderRenderer(Renderer):
         bpy.context.scene.unit_settings.mass_unit = 'KILOGRAMS'
         bpy.context.scene.unit_settings.time_unit = 'SECONDS'
         bpy.context.scene.unit_settings.temperature_unit = 'KELVIN'
-        bpy.context.scene.render.fps = 30
+        bpy.context.scene.render.fps = self.fps
 
         for cid in frame:
             self.add_component(frame[cid])
+
+        self.frame = 1
 
     def render_frame(self, frame: dict[int, Component]):
         for cid in frame:
@@ -25,11 +30,14 @@ class BlenderRenderer(Renderer):
             obj = bpy.data.objects[c.name]
             obj.location = (c.position.x, c.position.y, c.position.z)
             obj.rotation_quaternion = (c.rotation.w, c.rotation.x, c.rotation.y, c.rotation.z)
-            obj.dimensions = (c.size.x, c.size.y, c.size.z)
+            # obj.dimensions = (c.size.x, c.size.y, c.size.z)  TODO: Only scale can change
+
+            obj.keyframe_insert(data_path='location', frame=self.frame)
+            obj.keyframe_insert(data_path='rotation_quaternion', frame=self.frame)
+            # obj.keyframe_insert(data_path='dimensions', frame=self.frame)
 
     def next_frame(self):
-        bpy.context.scene.frame_set(bpy.context.scene.frame_current + 1)
-        bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+        self.frame += 1
 
     def add_component(self, c: Component):
         bpy.ops.mesh.primitive_uv_sphere_add(
@@ -45,6 +53,9 @@ class BlenderRenderer(Renderer):
         bpy.ops.object.select_all(action='DESELECT')
         bpy.data.objects[c.name].select_set(True)
         bpy.ops.object.delete()
+
+    def save(self, name: str = 'out'):
+        bpy.ops.wm.save_as_mainfile(filepath=f'{base_dir()}/data/{name}.blend')
 
     @staticmethod
     def _clear_scene():

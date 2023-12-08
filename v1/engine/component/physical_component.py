@@ -7,8 +7,14 @@ from v1.engine.util.vector3d import Vector3D
 
 
 class PhysicalComponent(Component):
+    """ Physical component """
+
     """ Mass in kg """
     mass: float
+
+    """ Force in Newton, resetted every frame for now """
+    net_force: Vector3D  # TODO: Not sure about this, no info about where the exact force is applied.
+    # Maybe list[{force: float, direction: Angle3D, location: Vector3D (from component origin)}] or something
 
     """ Center of Mass (reference: component origin) """
     com: Vector3D
@@ -35,16 +41,18 @@ class PhysicalComponent(Component):
                  size: Vector3D,
                  position: Vector3D,
                  mass: float,
-                 c_drag: float | dict[float, dict[float, dict[float, float]]],
+                 net_force: Vector3D = Vector3D(0, 0, 0),
                  rotation: Quaternion = Quaternion(1, 0, 0, 0),
                  com: Vector3D = Vector3D(0, 0, 0),
                  cop: Vector3D = Vector3D(0, 0, 0),
                  velocity: Vector3D = Vector3D(0, 0, 0),
                  angular_velocity: Angle3D = Angle3D(0, 0, 0),
+                 c_drag: float | dict[float, dict[float, dict[float, float]]] = 0,
                  ):
         super().__init__(name, size, position, rotation)
 
         self.mass = mass
+        self.net_force = net_force
         self.com = com
         self.cop = cop
         self.velocity = velocity
