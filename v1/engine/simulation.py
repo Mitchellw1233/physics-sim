@@ -7,6 +7,9 @@ from v1.engine.context.context_container import ContextContainer
 from v1.engine.context.simulation_context import SimulationContext
 from v1.engine.listener.listener import Listener
 from v1.engine.listener.physics_listener import PhysicsListener
+from v1.engine.settings import Settings
+from v1.engine.storage.csv_storage import CSVStorage
+from v1.engine.storage.storage import Storage
 from v1.rendering.renderer import Renderer
 
 
@@ -17,7 +20,9 @@ class ComponentMeta(TypedDict):
 class Simulation:
     """ Simulation """
 
-    renderer: Renderer
+    renderer: Renderer | None
+    storage: Storage | None
+    event_storage: Storage | None
     run: bool = False
 
     """ Environment containing all items
@@ -42,12 +47,22 @@ class Simulation:
     """ list[component_id] """
     physical_components: list[int] = []
 
+    events: dict | None = None  # EventContainer
+
     # Other
     context_container: ContextContainer
     loop_counter = 0
 
-    def __init__(self, renderer: Renderer, listeners: list[Type[Listener]], contexts: list[Context]):
+    def __init__(
+            self,
+            listeners: list[Type[Listener]],
+            contexts: list[Context],
+            renderer: Renderer = None,
+            storage: Storage = None,
+    ):
         self.renderer = renderer
+        self.storage = storage
+        self.event_storage = CSVStorage(storage.name + '_events', 1) if storage else None
 
         # Setup context container
         self.context_container = ContextContainer()
@@ -64,7 +79,8 @@ class Simulation:
 
     def setup(self):
         # Most is moved to add_component
-        self.renderer.setup(self.env)
+        if self.renderer is not None:
+            self.renderer.setup(self.env)
 
     def start(self):
         self.run = True
@@ -72,16 +88,17 @@ class Simulation:
             for lid in self.components_meta[cid]['listeners']:
                 self.listeners[lid].start(self.env[cid])
 
-        self.renderer.render_frame(self.env)
-        self.renderer.next_frame()
+        if self.renderer is not None:
+            self.renderer.render_frame(self.env)
+            self.renderer.next_frame()
 
         # thread = threading.Thread(target=target)
         # thread.start()
         while self.run is True:
-            self.loop_counter += 1
             self.loop()
 
     def loop(self):
+        self.loop_counter += 1
         print(f'loop count: {self.loop_counter}')
         # TODO: does order matter?
         # Execute single loop per listener
@@ -93,15 +110,28 @@ class Simulation:
             for lid in self.components_meta[cid]['listeners']:
                 self.listeners[lid].loop(self.env[cid])
 
+        # Append to storage
+        if self.storage is not None:
+            self.storage.append(self.env, self.loop_counter)
+
+        if self.events is not None and self.event_storage is not None:
+            self.event_storage.append(self.events, self.loop_counter)
+            self.events = None
+
         # Render/visualize next frame
-        self.renderer.render_frame(self.env)
-        self.renderer.next_frame()
-        if self.renderer.frame_limit == self.loop_counter:
+        if self.renderer is not None:
+            self.renderer.render_frame(self.env)
+            self.renderer.next_frame()
+        if Settings.frame_limit <= self.loop_counter:
             self.stop()
 
     def stop(self):
         self.run = False
-        self.renderer.save()
+
+        if self.storage is not None:
+            self.storage.save()
+        if self.renderer is not None:
+            self.renderer.save()
 
     def add_component(self, c: Component):
         c.id = list(self.env)[-1] + 1 if len(self.env) > 0 else 0
@@ -119,7 +149,14 @@ class Simulation:
 
         self.env[c.id] = c
         self.components_meta[c.id] = {'listeners': listener_ids}
-        self.renderer.add_component(c)
+
+        if self.renderer is not None:
+            self.renderer.add_component(c)
+
+        if self.event_storage is not None:
+            if self.events is None:
+                self.events = {'add': [], 'remove': []}
+            self.events['add'].append(c)
 
     def remove_component(self, component: int | str):
         cid = component
@@ -130,7 +167,14 @@ class Simulation:
         else:
             cname = self.env[component].name
 
+        if self.renderer is not None:
+            self.renderer.remove_component(self.env[cid])
+
+        if self.event_storage is not None:
+            if self.events is None:
+                self.events = {'add': [], 'remove': []}
+            self.events['remove'].append(self.env[cid])
+
         del self.env[cid]
         del self.components_meta[cid]
         del self.components_by_name[cname]
-        self.renderer.remove_component(self.env[cid])

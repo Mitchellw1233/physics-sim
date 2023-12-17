@@ -16,13 +16,11 @@ class PhysicsListener(Listener):
         pass
 
     def loop_single(self):
-        # print('======== Frame ========')
         # Reset history
         self.gravity_history = {}
 
     # Can safely assume PhysicalComponent because of should_listen()
     def loop(self, c: PhysicalComponent):
-        # print(f'LOOP: {c.id}-{c.name}')
         time_s = Settings.delta / 1000  # Time in seconds
 
         # Calculate gravity, very accurate but very inefficient
@@ -42,15 +40,7 @@ class PhysicsListener(Listener):
 
         # Translate force to acceleration, calculate velocity and add it to velocity
         a = c.net_force / c.mass
-        # print(f'{c.id}-{c.name}:')
-        # print(f'    force: {c.net_force.__dict__}')
-        # print(f'    pos: {c.position.__dict__}')
-        # for t in test:
-        #     print(t)
-        # print(f'    pre-velocity: {c.velocity.__dict__}')
-        # print(f'    force_velocity: {(a * time_s).__dict__}')
         c.velocity += a * time_s
-        # print(f'    post-velocity: {c.velocity.__dict__}')
 
         # Reset force
         c.net_force = 0
@@ -66,7 +56,7 @@ class PhysicsListener(Listener):
         return isinstance(c, PhysicalComponent)
 
     def _compute_gravity(self, c: PhysicalComponent, other: PhysicalComponent):
-        # Calculate translation and distance (converted to meters) with a minimum of 1 to avoid devision errors
+        # Calculate translation and distance (converted to meters) with a minimum of 1 to avoid division errors
         #   and should be physically impossible, because it would attract more than it's mass allows
         pos_diff = (other.position - c.position) * 1000
         distance = math.sqrt(pos_diff.x ** 2 + pos_diff.y ** 2 + pos_diff.z ** 2)

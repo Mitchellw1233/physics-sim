@@ -41,6 +41,7 @@ class PhysicalComponent(Component):
                  size: Vector3D,
                  position: Vector3D,
                  mass: float,
+                 id: int = None,
                  net_force: Vector3D = Vector3D(0, 0, 0),
                  rotation: Quaternion = Quaternion(1, 0, 0, 0),
                  com: Vector3D = Vector3D(0, 0, 0),
@@ -49,7 +50,7 @@ class PhysicalComponent(Component):
                  angular_velocity: Angle3D = Angle3D(0, 0, 0),
                  c_drag: float | dict[float, dict[float, dict[float, float]]] = 0,
                  ):
-        super().__init__(name, size, position, rotation)
+        super().__init__(name, size, position, rotation, id=id)
 
         self.mass = mass
         self.net_force = net_force

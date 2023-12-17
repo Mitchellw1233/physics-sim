@@ -3,18 +3,26 @@ import math
 from v1.engine.component.physical_component import PhysicalComponent
 from v1.engine.settings import Settings
 from v1.engine.simulation import Simulation
+from v1.engine.storage.csv_storage import CSVStorage
 from v1.engine.util.angle3d import Angle3D
 from v1.engine.util.quaternion import Quaternion
 from v1.engine.util.vector3d import Vector3D
 from v1.rendering.blender_renderer import BlenderRenderer
-from v1.rendering.renderer import Renderer
 
 Settings.fps = 30
-Settings.delta = 1000 * 60 * 30  # 30min * fps = 900min per seconde
-Settings.frame_limit = 30*60 * 10
+Settings.delta = 1000 * 60 * 30  # 1s * 60 * 30 = 30min
+# simulated time/s = delta * fps = 900min/s (15h/s)
+Settings.frame_limit = int(365.25 * 86400000 / Settings.delta)  # 1 year in ms (divided by delta)
 
+# BlenderRenderer(Settings.fps, Settings.frame_limit)
+name = 'sun_earth'
+sim = Simulation(
+    [],
+    [],
+    renderer=BlenderRenderer(Settings.fps, Settings.frame_limit, name),
+    # storage=CSVStorage(name, 10000),
+)
 
-sim = Simulation(BlenderRenderer(Settings.fps, Settings.frame_limit), [], [])
 sim.add_component(PhysicalComponent(
     name='sun',
     position=Vector3D.zero(),
@@ -35,3 +43,9 @@ sim.add_component(PhysicalComponent(
 if __name__ == '__main__':
     sim.setup()
     sim.start()
+    # i = 0
+    # print('Loading frames..')
+    # for frame in sim.storage.read_as_objects():
+    #     i += 1
+    #
+    # print(f'loaded {i} frames as objects')

@@ -1,3 +1,5 @@
+import os.path
+
 import bpy
 
 from root import base_dir
@@ -54,8 +56,8 @@ class BlenderRenderer(Renderer):
         bpy.data.objects[c.name].select_set(True)
         bpy.ops.object.delete()
 
-    def save(self, name: str = 'out'):
-        bpy.ops.wm.save_as_mainfile(filepath=f'{base_dir()}/data/{name}.blend')
+    def save(self):
+        bpy.ops.wm.save_as_mainfile(filepath=os.path.join(base_dir(), 'data', f'{self.name}.blend'))
 
     @staticmethod
     def _clear_scene():

@@ -6,10 +6,12 @@ from v1.engine.component.component import Component
 class Renderer:
     fps: int
     frame_limit: int
+    name: str
 
-    def __init__(self, fps: int, frame_limit: int):
+    def __init__(self, fps: int, frame_limit: int, name: str):
         self.fps = fps
         self.frame_limit = frame_limit
+        self.name = name
 
     @abstractmethod
     def setup(self, frame: dict[int, Component]):
@@ -24,7 +26,7 @@ class Renderer:
         pass
 
     @abstractmethod
-    def save(self, name: str = 'out'):
+    def save(self):
         pass
 
     @abstractmethod

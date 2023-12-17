@@ -18,7 +18,15 @@ class Component:
     """ Actual rotational position of component (referenced: origin) """
     rotation: Quaternion
 
-    def __init__(self, name: str, size: Vector3D, position: Vector3D, rotation: Quaternion = Quaternion(1, 0, 0, 0)):
+    def __init__(self,
+                 name: str,
+                 size: Vector3D,
+                 position: Vector3D,
+                 rotation: Quaternion = Quaternion(1, 0, 0, 0),
+                 id: int = None,
+                 ):
+        if id is not None:
+            self.id = id
         self.name = name
         self.size = size
         self.position = position
