@@ -15,7 +15,7 @@ class BlenderRenderer(Renderer):
 
         bpy.context.scene.unit_settings.system = 'METRIC'
         bpy.context.scene.unit_settings.system_rotation = 'RADIANS'
-        bpy.context.scene.unit_settings.length_unit = 'KILOMETERS'
+        bpy.context.scene.unit_settings.length_unit = 'METERS'
         bpy.context.scene.unit_settings.mass_unit = 'KILOGRAMS'
         bpy.context.scene.unit_settings.time_unit = 'SECONDS'
         bpy.context.scene.unit_settings.temperature_unit = 'KELVIN'

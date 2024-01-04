@@ -14,8 +14,12 @@ class Listener:
         """ Executed once per component on start of simulation """
         pass
 
-    def loop_single(self):
-        """ Executed once per frame, no component attached """
+    def loop_single_before(self):
+        """ Executed once per frame, before loop, no component attached """
+        pass
+
+    def loop_single_after(self):
+        """ Executed once per frame, after loop, no component attached """
         pass
 
     def loop(self, c: Component):

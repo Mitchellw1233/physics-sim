@@ -37,20 +37,17 @@ class PhysicalComponent(Component):
     #           (altitude). So density, relative_direction or absolute_direction, relative_velocity or abs_velocity etc
 
     def __init__(self,
-                 name: str,
-                 size: Vector3D,
-                 position: Vector3D,
                  mass: float,
-                 id: int = None,
                  net_force: Vector3D = Vector3D(0, 0, 0),
-                 rotation: Quaternion = Quaternion(1, 0, 0, 0),
                  com: Vector3D = Vector3D(0, 0, 0),
                  cop: Vector3D = Vector3D(0, 0, 0),
                  velocity: Vector3D = Vector3D(0, 0, 0),
                  angular_velocity: Angle3D = Angle3D(0, 0, 0),
                  c_drag: float | dict[float, dict[float, dict[float, float]]] = 0,
+                 *args,
+                 **kwargs
                  ):
-        super().__init__(name, size, position, rotation, id=id)
+        super().__init__(*args, **kwargs)
 
         self.mass = mass
         self.net_force = net_force

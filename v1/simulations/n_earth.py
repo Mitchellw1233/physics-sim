@@ -19,27 +19,27 @@ sim = Simulation(
     # storage=CSVStorage(name, 10000),
 )
 
-if __name__ == '__main__':
-    for i in range(int(20)):
-        print(i)
-        # TODO: Very slow with dicts because of hash collisions. Change to list structure and make deletion of object
-        #       O(n) or alternatively just make None, but not the best idea
-        sim.add_component(PhysicalComponent(
-            name=f'earth-{i:06d}',
-            size=Vector3D(12756, 12756, 12756),
-            position=Vector3D(
-                random.randint(0, 20) * 15000,
-                random.randint(0, 20) * 15000,
-                random.randint(0, 10) * 15000,
-            ),
-            mass=5.972e+24,
-            velocity=Vector3D(
-                random.randint(-20, 20),
-                random.randint(-20, 20),
-                random.randint(-20, 20),
-            ),
-            c_drag=0.3,
-        ))
+for i in range(int(20)):
+    print(i)
+    # TODO: Very slow with dicts because of hash collisions. Change to list structure and make deletion of object
+    #       O(n) or alternatively just make None, but not the best idea
+    sim.add_component(PhysicalComponent(
+        name=f'earth-{i:06d}',
+        size=Vector3D(12756000, 12756000, 12756000),
+        position=Vector3D(
+            random.randint(0, 20) * 15000000,
+            random.randint(0, 20) * 15000000,
+            random.randint(0, 10) * 15000000,
+        ),
+        mass=5.972e+24,
+        velocity=Vector3D(
+            random.randint(-20, 20),
+            random.randint(-20, 20),
+            random.randint(-20, 20),
+        ),
+        c_drag=0.3,
+    ))
 
+if __name__ == '__main__':
     sim.setup()
     sim.start()

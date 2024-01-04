@@ -9,10 +9,10 @@ class Component:
     """ Unique name of component """
     name: str
 
-    """ 3D size of object in km """
+    """ 3D size of object in meters """
     size: Vector3D
 
-    """ Position of component in km """
+    """ Position of component in meters """
     position: Vector3D
 
     """ Actual rotational position of component (referenced: origin) """

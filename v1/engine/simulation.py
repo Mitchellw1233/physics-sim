@@ -100,15 +100,19 @@ class Simulation:
     def loop(self):
         self.loop_counter += 1
         print(f'loop count: {self.loop_counter}')
-        # TODO: does order matter?
-        # Execute single loop per listener
+
+        # Execute single loop before normal loop per listener
         for lid in self.listeners:
-            self.listeners[lid].loop_single()
+            self.listeners[lid].loop_single_before()
 
         # For each component, execute the loop of its listeners
         for cid in self.env:
             for lid in self.components_meta[cid]['listeners']:
                 self.listeners[lid].loop(self.env[cid])
+
+        # Execute single loop after normal loop per listener
+        for lid in self.listeners:
+            self.listeners[lid].loop_single_after()
 
         # Append to storage
         if self.storage is not None:

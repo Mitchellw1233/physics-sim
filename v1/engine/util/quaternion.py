@@ -1,7 +1,6 @@
-from math import atan2, asin, pi, cos, sin
+from math import atan2, asin, cos, sin
 
 from v1.engine.util.angle3d import Angle3D
-from v1.engine.util.vector3d import Vector3D
 
 
 class Quaternion:
